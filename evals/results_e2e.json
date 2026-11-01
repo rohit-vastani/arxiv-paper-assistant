@@ -1,0 +1,182 @@
+[
+  {
+    "id": 1,
+    "question": "How many identical layers are in the encoder of the base model?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 58.94,
+    "answer": "The encoder of the model is composed of a stack of $N=6$ identical layers (page 3)."
+  },
+  {
+    "id": 2,
+    "question": "What output dimension do all sub-layers and embedding layers produce?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 59.65,
+    "answer": "All sub-layers and embedding layers in the model produce outputs of dimension $d_{model} = 512$ (page 3)."
+  },
+  {
+    "id": 3,
+    "question": "How many parallel attention heads does the model use?",
+    "answerable": true,
+    "ok": false,
+    "detail": "request failed: timed out",
+    "seconds": null,
+    "answer": ""
+  },
+  {
+    "id": 4,
+    "question": "Which optimizer was used to train the models?",
+    "answerable": true,
+    "ok": false,
+    "detail": "request failed: Server error '502 Bad Gateway' for url 'http://localhost:8000/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502",
+    "seconds": null,
+    "answer": ""
+  },
+  {
+    "id": 5,
+    "question": "How does the learning rate change during training?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 90.48,
+    "answer": "In this paper, the learning rate is varied throughout training according to the following formula (page 7):\n\n$$\\text{lrate} = d_{\\text{model}}^{-0.5} \\cdot \\min(\\text{step\\_num}^{-0.5}, \\text{step\\_num} \\cdot \\text{warmup\\_steps}^{-1.5})$$\n\nThis schedule involves two phases (page 7):\n*   **Warm-up phase:** The learning rate increases linearly for the first `warmup_steps` (which was set to 4,000).\n*   **Decay phase:** After the warm-up, the learning rate decreases proportionally to the inverse square root of the step number."
+  },
+  {
+    "id": 6,
+    "question": "What hardware were the models trained on?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 29.13,
+    "answer": "The models were trained on a single machine equipped with 8 NVIDIA P100 GPUs (page 7). Additionally, in calculating training costs and floating point operations, the authors reference utilizing sustained single-precision floating-point capacity values for K80, K40, M40, and P100 GPUs (page 8)."
+  },
+  {
+    "id": 7,
+    "question": "How long did it take to train the base models?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 22.17,
+    "answer": "The base models were trained for a total of 100,000 steps, which took 12 hours (page 7)."
+  },
+  {
+    "id": 8,
+    "question": "How long was the big model trained for?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 34.25,
+    "answer": "The big model was trained for 300,000 steps, which took 3.5 days (page 7). This training was performed on a machine with 8 NVIDIA P100 GPUs (page 7, 8)."
+  },
+  {
+    "id": 9,
+    "question": "What BLEU score did the big model reach on English-to-German translation?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 26.67,
+    "answer": "The big transformer model achieved a BLEU score of 28.4 on the WMT 2014 English-to-German translation task (page 8)."
+  },
+  {
+    "id": 10,
+    "question": "How does the model encode the position of tokens in the sequence?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 14.79,
+    "answer": "To encode the position of tokens in the sequence, the model adds \"positional encodings\" to the input embeddings at the bottoms of both the encoder and decoder stacks (page 6). These encodings have the same dimensionality ($d_{\\text{model}} = 512$) as the embeddings, allowing the two to be summed (page 6).\n\nThe model uses sine and cosine functions of different frequencies to calculate these encodings (page 6):\n\n$$PE_{(pos, 2i)} = \\sin(pos/10000^{2i/d_{\\text{model}}})$$\n$$PE_{(pos, 2i+1)} = \\cos(pos/10000^{2i/d_{\\text{model}}})$$\n\nIn these formulas, $pos$ is the position and $i$ is the dimension. Each dimension of the positional encoding corresponds to a sinusoid, with wavelengths forming a geometric progression from $2\\pi$ to $10000 \\cdot 2\\pi$ (page 6).\n\nThe authors chose this function because they hypothesized it would allow the model to easily learn to attend by relative positions, as $PE_{pos+k}$ can be represented as a linear function of $PE_{pos}$ for any fixed offset $k$ (page 6). The paper notes that they also experimented with learned positional embeddings and found that both versions produced nearly identical results (page 6)."
+  },
+  {
+    "id": 11,
+    "question": "What label smoothing value was used during training?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 29.36,
+    "answer": "During training, label smoothing was employed with a value of $\\epsilon_{ls} = 0.1$ (page 8)."
+  },
+  {
+    "id": 12,
+    "question": "Why are the dot products scaled by the square root of d_k?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 2.68,
+    "answer": "The dot products are scaled by $\\frac{1}{\\sqrt{d_k}}$ to counteract the tendency of dot products to grow large in magnitude as the dimension $d_k$ increases.\n\nIf the components of the query ($q$) and key ($k$) vectors are assumed to be independent random variables with mean 0 and variance 1, their dot product has a mean of 0 and a variance of $d_k$ (page 4). \n\nWhen these dot products become very large, they push the softmax function into regions where it has extremely small gradients, which can hinder training (page 4). Scaling by $\\frac{1}{\\sqrt{d_k}}$ offsets this effect (page 4)."
+  },
+  {
+    "id": 13,
+    "question": "How were sentences encoded for English-German translation?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 10.5,
+    "answer": "For the WMT 2014 English-German translation task, sentences were encoded using byte-pair encoding (BPE) (page 7). This method utilized a shared source-target vocabulary of approximately 37,000 tokens (page 7)."
+  },
+  {
+    "id": 14,
+    "question": "What stops the decoder from attending to future positions?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 2.7,
+    "answer": "To prevent the decoder from attending to future positions and to preserve the auto-regressive property, the model uses **masking** within the self-attention sub-layers (pages 3, 5).\n\nSpecifically, this is implemented inside the scaled dot-product attention by setting the values corresponding to \"illegal connections\" (future positions) to $-\\infty$ before the softmax operation. This ensures that the predictions for a given position $i$ can depend only on known outputs at positions less than $i$ (pages 3, 5)."
+  },
+  {
+    "id": 15,
+    "question": "Did learned positional embeddings perform differently from the sinusoidal version?",
+    "answerable": true,
+    "ok": true,
+    "detail": "answer has the expected facts, evidence retrieved",
+    "seconds": 16.66,
+    "answer": "The authors found that learned positional embeddings and the sinusoidal version produced \"nearly identical results\" (pages 6, 9). \n\nThe researchers ultimately chose the sinusoidal version because they hypothesized it might allow the model to extrapolate to sequence lengths longer than those encountered during training (page 6)."
+  },
+  {
+    "id": 16,
+    "question": "What did the authors say about BERT?",
+    "answerable": false,
+    "ok": false,
+    "detail": "made-up facts: ['2018']",
+    "seconds": 11.64,
+    "answer": "The paper \"Attention Is All You Need\" (arXiv:1706.03762v7) does not mention BERT. This is likely because the paper was published in 2017, whereas BERT was introduced later, in 2018."
+  },
+  {
+    "id": 17,
+    "question": "What learning rate did they use when fine-tuning the model on downstream tasks?",
+    "answerable": false,
+    "ok": false,
+    "detail": "request failed: timed out",
+    "seconds": null,
+    "answer": ""
+  },
+  {
+    "id": 18,
+    "question": "What accuracy did the model achieve on ImageNet?",
+    "answerable": false,
+    "ok": true,
+    "detail": "refused",
+    "seconds": 30.46,
+    "answer": "The paper 1706.03762v7 (\"Attention Is All You Need\") does not appear to discuss or report results on ImageNet. It focuses on the Transformer architecture for sequence transduction tasks like machine translation."
+  },
+  {
+    "id": 19,
+    "question": "How does the model compare with GPT-3 on benchmarks?",
+    "answerable": false,
+    "ok": true,
+    "detail": "refused",
+    "seconds": 19.91,
+    "answer": "The paper (1706.03762v7) does not contain information regarding GPT-3. The paper was published in 2017, and the benchmarks discussed primarily concern machine translation tasks, such as the WMT 2014 English-to-German and English-to-French translation tasks (page 8)."
+  },
+  {
+    "id": 20,
+    "question": "What word error rate did the model reach on speech recognition?",
+    "answerable": false,
+    "ok": true,
+    "detail": "refused",
+    "seconds": 2.38,
+    "answer": "The provided paper (*Attention Is All You Need*) does not discuss speech recognition or report a word error rate for that task. The paper focuses on machine translation and English constituency parsing (page 1)."
+  }
+]
